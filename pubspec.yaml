@@ -1,0 +1,33 @@
+name: zombies
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  flame: ^1.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  assets_gen: any
+  build_runner: any
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/tiles/world.tmx
+    - assets/characters/Adventurer/Poses/
+    - assets/characters/Zombie/Poses/
+    - assets/dungeon/
+    - assets/town/
