@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
+import 'package:flame_tiled/flame_tiled.dart';
 import 'package:zombies/components/world.dart';
+import 'package:zombies/constants.dart';
 
 import 'assets.dart';
 
@@ -15,6 +18,7 @@ class ZombieGame extends FlameGame with HasKeyboardHandlerComponents {
 
   final ZombieWorld _world;
   late final CameraComponent cameraComponent;
+  Vector2 get worldSize => _world.worldSize;
 
   @override
   FutureOr<void> onLoad() async {
@@ -22,10 +26,7 @@ class ZombieGame extends FlameGame with HasKeyboardHandlerComponents {
       Assets.assets_characters_Adventurer_Poses_adventurer_action1_png,
       Assets.assets_town_tile_0000_png,
     ]);
-    cameraComponent.viewfinder.anchor = Anchor.center;
     add(_world);
     add(cameraComponent);
-    cameraComponent.follow(_world.player);
-    return super.onLoad();
   }
 }
