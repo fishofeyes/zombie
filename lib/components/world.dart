@@ -31,6 +31,7 @@ class ZombieWorld extends World with HasGameRef<ZombieGame> {
 
   @override
   void onGameResize(Vector2 size) {
+    // 重置世界地图大小
     if (!gameRef.cameraComponent.isMounted) return;
     _resizeCamera();
     super.onGameResize(size);
