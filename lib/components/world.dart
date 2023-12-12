@@ -4,9 +4,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/material.dart';
 import 'package:zombies/assets.dart';
-import 'package:zombies/components/land.dart';
 import 'package:zombies/components/player.dart';
 import 'package:zombies/components/unwalkable_component.dart';
 import 'package:zombies/constants.dart';
@@ -15,17 +13,16 @@ import 'package:zombies/zombie_game.dart';
 class ZombieWorld extends World with HasGameRef<ZombieGame> {
   ZombieWorld({super.children});
 
-  final List<Land> land = [];
   late final Player player;
   late final TiledComponent map;
   Vector2 get worldSize => Vector2(map.width, map.height);
   @override
   FutureOr<void> onLoad() async {
     map = await TiledComponent.load('world.tmx', Vector2.all(worldTileSize));
-    add(map);
 
     final playerImage = game.images.fromCache(Assets.assets_characters_Adventurer_Poses_adventurer_action1_png);
     player = Player(position: Vector2(worldTileSize * 12.5, worldTileSize * 5.5), sprite: Sprite(playerImage));
+    game.cameraComponent.follow(player);
 
     final objectLayer = map.tileMap.getLayer<ObjectGroup>('Objects');
     for (final o in (objectLayer?.objects ?? <TiledObject>[])) {
@@ -38,8 +35,7 @@ class ZombieWorld extends World with HasGameRef<ZombieGame> {
 
       add(UnwalkableComponent(veritices));
     }
-    add(player);
-    game.cameraComponent.follow(player);
+    addAll([map, player]);
   }
 
   @override

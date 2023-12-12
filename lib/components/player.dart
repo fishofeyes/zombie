@@ -32,7 +32,9 @@ class Player extends SpriteComponent with KeyboardHandler, HasGameReference<Zomb
     if (movementFrame.y < 0) {
       // moving up
       final newTop = positionOfAnchor(Anchor.topCenter);
-      for (final e in game.world.componentsAtPoint(newTop)) {
+      final _list = game.world.componentsAtPoint(newTop);
+      print("newTop: $newTop, list:$_list");
+      for (final e in _list) {
         if (e is UnwalkableComponent) {
           movementFrame.y = 0;
           break;
