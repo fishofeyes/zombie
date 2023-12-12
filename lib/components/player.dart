@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
+import 'package:zombies/components/unwalkable_component.dart';
 import 'package:zombies/constants.dart';
 import 'package:zombies/zombie_game.dart';
 
@@ -25,7 +26,48 @@ class Player extends SpriteComponent with KeyboardHandler, HasGameReference<Zomb
 
   @override
   void update(double dt) {
-    position.add(movement * speed * dt);
+    final originalPosition = position.clone();
+    final movementFrame = movement * speed * dt;
+    position.add(movementFrame);
+    if (movementFrame.y < 0) {
+      // moving up
+      final newTop = positionOfAnchor(Anchor.topCenter);
+      for (final e in game.world.componentsAtPoint(newTop)) {
+        if (e is UnwalkableComponent) {
+          movementFrame.y = 0;
+          break;
+        }
+      }
+    }
+    if (movementFrame.y > 0) {
+      // moving down
+      final newBottom = positionOfAnchor(Anchor.bottomCenter);
+      for (final e in game.world.componentsAtPoint(newBottom)) {
+        if (e is UnwalkableComponent) {
+          movementFrame.y = 0;
+          break;
+        }
+      }
+    }
+    if (movementFrame.x < 0) {
+      final newLeft = positionOfAnchor(Anchor.centerLeft);
+      for (final e in game.world.componentsAtPoint(newLeft)) {
+        if (e is UnwalkableComponent) {
+          movementFrame.x = 0;
+          break;
+        }
+      }
+    }
+    if (movementFrame.x > 0) {
+      final newRight = positionOfAnchor(Anchor.centerRight);
+      for (final e in game.world.componentsAtPoint(newRight)) {
+        if (e is UnwalkableComponent) {
+          movementFrame.x = 0;
+          break;
+        }
+      }
+    }
+    position = originalPosition + movementFrame;
     position.clamp(halfSize, maxPosition);
   }
 

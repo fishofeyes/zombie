@@ -28,5 +28,6 @@ class ZombieGame extends FlameGame with HasKeyboardHandlerComponents {
     ]);
     add(_world);
     add(cameraComponent);
+    debugMode = true;
   }
 }
