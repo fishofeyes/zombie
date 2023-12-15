@@ -1,12 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
+import 'package:zombies/assets.dart';
 import 'package:zombies/components/unwalkable_component.dart';
 import 'package:zombies/constants.dart';
 import 'package:zombies/zombie_game.dart';
 
 class Player extends SpriteComponent with KeyboardHandler, HasGameReference<ZombieGame> {
-  Player({super.position, super.sprite})
+  Player()
       : super(
+          position: Vector2(worldTileSize * 12.5, worldTileSize * 5.5),
           size: Vector2.all(64),
           anchor: Anchor.center,
           priority: 1, // 图层显示优先级
@@ -22,6 +24,7 @@ class Player extends SpriteComponent with KeyboardHandler, HasGameReference<Zomb
   @override
   void onLoad() {
     maxPosition = game.worldSize - halfSize;
+    sprite = Sprite(game.images.fromCache(Assets.assets_characters_Adventurer_Poses_adventurer_action1_png));
   }
 
   @override

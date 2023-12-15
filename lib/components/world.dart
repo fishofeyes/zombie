@@ -4,9 +4,9 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:zombies/assets.dart';
 import 'package:zombies/components/player.dart';
 import 'package:zombies/components/unwalkable_component.dart';
+import 'package:zombies/components/zombie.dart';
 import 'package:zombies/constants.dart';
 import 'package:zombies/zombie_game.dart';
 
@@ -16,25 +16,41 @@ class ZombieWorld extends World with HasGameRef<ZombieGame> {
   late final Player player;
   late final TiledComponent map;
   Vector2 get worldSize => Vector2(map.width, map.height);
+
+  final unwalkableComponentEdge = <Line>[];
+
   @override
   FutureOr<void> onLoad() async {
     map = await TiledComponent.load('world.tmx', Vector2.all(worldTileSize));
     add(map);
-    final playerImage = game.images.fromCache(Assets.assets_characters_Adventurer_Poses_adventurer_action1_png);
-    player = Player(position: Vector2(worldTileSize * 12.5, worldTileSize * 5.5), sprite: Sprite(playerImage));
-    game.cameraComponent.follow(player);
 
     final objectLayer = map.tileMap.getLayer<ObjectGroup>('Objects');
     for (final o in (objectLayer?.objects ?? <TiledObject>[])) {
       if (!o.isPolygon) return;
       if (!o.properties.byName.containsKey('blocksMovement')) return;
       final veritices = <Vector2>[];
-      for (final p in o.polygon) {
-        veritices.add(Vector2((p.x + o.x) * worldScale, (p.y + o.y) * worldScale));
-      }
+      Vector2? lastPoint;
+      Vector2? firstPoint;
 
+      for (final p in o.polygon) {
+        final nextPoint = Vector2((p.x + o.x) * worldScale, (p.y + o.y) * worldScale);
+        firstPoint ??= nextPoint;
+        veritices.add(nextPoint);
+        if (lastPoint != null) {
+          unwalkableComponentEdge.add(Line(lastPoint, nextPoint));
+        }
+        lastPoint = nextPoint;
+      }
+      unwalkableComponentEdge.add(Line(lastPoint!, firstPoint!));
       add(UnwalkableComponent(veritices));
     }
+
+    final zombie = Zombie(
+      position: Vector2(worldTileSize * 15.5, worldTileSize * 5),
+    );
+    add(zombie);
+    player = Player();
+    game.cameraComponent.follow(player);
     add(player);
   }
 
@@ -55,5 +71,16 @@ class ZombieWorld extends World with HasGameRef<ZombieGame> {
       worldSize.y - gameRef.size.y / 2,
     );
     gameRef.cameraComponent.setBounds(rect);
+  }
+}
+
+class Line {
+  final Vector2 start;
+  final Vector2 end;
+
+  Line(this.start, this.end);
+
+  double get slope {
+    return (end.y - start.y) / (end.x - start.x);
   }
 }
