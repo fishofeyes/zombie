@@ -37,12 +37,44 @@ class Zombie extends SpriteComponent with KeyboardHandler, HasGameReference<Zomb
 
   void moveAlongPath(Line pathToPlayer, double dt) {
     final originalPosition = position.clone();
-
+    final Line? collision = _getUnWalkableCollision(pathToPlayer);
+    if (collision != null) {
+      final distanceToStart = Line(game.world.player.position, collision.start).length2;
+      final distanceToEnd = Line(game.world.player.position, collision.end).length2;
+      if (distanceToStart < distanceToEnd) {
+        pathToPlayer = Line(position, collision.start).extend(1.5);
+      } else {
+        pathToPlayer = Line(position, collision.end).extend(1.5);
+      }
+    }
     final movement = pathToPlayer.vector2.normalized();
     final movementFrame = movement * speed * dt;
-
     position.add(movementFrame);
     applyMovement(originalPosition, movementFrame);
     position = originalPosition + movementFrame;
+  }
+
+  Line? _getUnWalkableCollision(Line pathToPlayer) {
+    Vector2? neareastIntersection;
+    double? shortestLength;
+    Line? unwalkableBoundary;
+    for (final line in game.world.unwalkableComponentEdge) {
+      Vector2? intersection = pathToPlayer.intersectsAt(line);
+      if (intersection != null) {
+        if (neareastIntersection == null) {
+          neareastIntersection = intersection;
+          shortestLength = Line(position, intersection).length2;
+          unwalkableBoundary = line;
+        } else {
+          final lengthToThisPoint = Line(position, intersection).length2;
+          if (lengthToThisPoint < shortestLength!) {
+            shortestLength = lengthToThisPoint;
+            neareastIntersection = intersection;
+            unwalkableBoundary = line;
+          }
+        }
+      }
+    }
+    return unwalkableBoundary;
   }
 }

@@ -23,6 +23,11 @@ class Line extends Equatable {
   late final double dx = end.x - start.x;
   late final double dy = end.y - start.y;
 
+  Line extend(double multiplier) {
+    final longerVector = vector2 * multiplier;
+    return Line(start, longerVector + start);
+  }
+
   Vector2? _vector2;
   Vector2 get vector2 {
     _vector2 ??= Vector2(end.x - start.x, end.y - start.y);
